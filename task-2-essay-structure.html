@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to IELTS Band 9 Essays</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Stone, Teal, Amber) -->
+    <!-- Application Structure Plan: A single-page, vertical scrolling application with clear thematic sections for the essay blueprint, paragraph structure, and time management. The core interactive feature is a 'Question Type Adapter' where users click buttons (Opinion, Discussion, etc.) to dynamically update the body paragraph guidance. This task-oriented design transforms the static guide into an active learning tool, allowing users to see exactly how to apply the core structure to different scenarios, which is more effective for learning than a static document. Navigation is handled by a simple header. -->
+    <!-- Visualization & Content Choices: Report Info: Word count distribution -> Goal: Inform -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Quickly shows paragraph proportions. | Report Info: Time management -> Goal: Inform -> Viz: Doughnut Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: More engaging than a list. | Report Info: Paragraph structure -> Goal: Organize -> Viz: HTML/CSS/JS Accordion -> Interaction: Click to expand -> Justification: Breaks down complex info into manageable chunks. | Report Info: Adapting for question types -> Goal: Compare/Organize -> Viz: HTML buttons + JS dynamic text block -> Interaction: Click to update content -> Justification: The key interactive feature, provides customized guidance on demand. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .active-btn {
+            background-color: #0d9488;
+            color: white;
+            transform: scale(1.05);
+        }
+        .inactive-btn {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+        .expert-tip {
+            border-left: 4px solid #f59e0b;
+            background-color: #fffbeb;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700">
+
+<div class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+
+    <header class="text-center mb-12">
+        <h1 class="text-4xl sm:text-5xl font-bold text-teal-800 mb-4">IELTS Writing Task 2 Essay Structure Guide</h1>
+        <p class="text-lg text-slate-600 max-w-3xl mx-auto">Master the Band 9 essay structure with this hands-on guide. Interact with the concepts to truly understand how to build a high-scoring response.</p>
+    </header>
+
+    <main class="space-y-16">
+
+        <section id="blueprint">
+            <h2 class="text-3xl font-bold text-center mb-2 text-teal-700">The Four-Paragraph Blueprint</h2>
+            <p class="text-center text-slate-600 mb-8">Every high-scoring essay is built on this simple, powerful foundation. Below is a visual breakdown of the ideal word count distribution. Aim for a total of 260-290 words.</p>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="chart-container h-80 sm:h-96 max-w-2xl">
+                    <canvas id="blueprintChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="paragraphs">
+            <h2 class="text-3xl font-bold text-center mb-2 text-teal-700">Paragraph-by-Paragraph Breakdown</h2>
+            <p class="text-center text-slate-600 mb-8">Each paragraph has a specific job. Click on each section below to reveal its purpose and structure. Pay close attention to the Body Paragraphs, as they are the core of your essay.</p>
+            <div class="space-y-4">
+                <div class="accordion-item bg-white rounded-xl shadow-lg">
+                    <button class="accordion-header w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-teal-800">1. The Introduction</span>
+                        <span class="text-2xl font-bold text-teal-500 transform transition-transform duration-300">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 pt-0 text-slate-600 space-y-4">
+                            <p>Your introduction is your first impression. It should be concise and powerful, consisting of just two sentences.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong class="font-semibold">Sentence 1: Paraphrase the Question.</strong> Rephrase the essay topic in your own words to show you understand it.</li>
+                                <li><strong class="font-semibold">Sentence 2: The Thesis Statement.</strong> This is your most important sentence. It must directly answer the question and state your position or the main points you will discuss.</li>
+                            </ul>
+                            <div class="expert-tip p-4 rounded-lg mt-4">
+                                <p><strong class="font-bold text-amber-700">⭐ Expert Tip:</strong> A clear thesis is the hallmark of a Band 9 essay. It tells the examiner exactly what to expect and shows you have a well-planned argument right from the start.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-white rounded-xl shadow-lg">
+                    <button class="accordion-header w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-teal-800">2 & 3. The Body Paragraphs</span>
+                        <span class="text-2xl font-bold text-teal-500 transform transition-transform duration-300">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 pt-0 text-slate-600 space-y-4">
+                            <p>This is where you earn the most marks. The golden rule is: <strong class="font-semibold">one paragraph, one main idea.</strong> Don't mix different arguments.</p>
+                            <div class="text-center my-4">
+                                <div class="inline-flex items-center justify-center p-3 bg-teal-50 rounded-lg font-semibold text-teal-800">Topic Sentence</div>
+                                <div class="text-teal-400 text-2xl font-light mx-2">↓</div>
+                                <div class="inline-flex items-center justify-center p-3 bg-teal-50 rounded-lg font-semibold text-teal-800">Explanation</div>
+                                <div class="text-teal-400 text-2xl font-light mx-2">↓</div>
+                                <div class="inline-flex items-center justify-center p-3 bg-teal-50 rounded-lg font-semibold text-teal-800">Example</div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg text-teal-700 mb-4 text-center">Adapting to Different Question Types</h4>
+                                <p class="text-center text-slate-500 mb-4">The core structure is flexible. Click the buttons below to see how to adapt the body paragraphs for the most common essay types.</p>
+                                <div class="flex flex-wrap justify-center gap-3 mb-4">
+                                    <button id="btn-opinion" class="question-type-btn px-5 py-2 font-semibold rounded-full transition-all duration-300 shadow">Opinion</button>
+                                    <button id="btn-discussion" class="question-type-btn px-5 py-2 font-semibold rounded-full transition-all duration-300 shadow">Discussion</button>
+                                    <button id="btn-problem" class="question-type-btn px-5 py-2 font-semibold rounded-full transition-all duration-300 shadow">Problem/Solution</button>
+                                </div>
+                                <div id="question-type-content" class="bg-slate-100 p-4 rounded-lg text-sm transition-all duration-300 min-h-[100px]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-white rounded-xl shadow-lg">
+                    <button class="accordion-header w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-teal-800">4. The Conclusion</span>
+                        <span class="text-2xl font-bold text-teal-500 transform transition-transform duration-300">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 pt-0 text-slate-600 space-y-4">
+                            <p>The conclusion should be a short, clean summary of your essay.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong class="font-semibold">Sentence 1: Restate Your Thesis.</strong> Rephrase your main argument from the introduction using different vocabulary.</li>
+                                <li><strong class="font-semibold">Sentence 2 (Recommended):</strong> Briefly summarize the two main points from your body paragraphs.</li>
+                            </ul>
+                            <div class="expert-tip p-4 rounded-lg mt-4">
+                                <p><strong class="font-bold text-amber-700">⭐ Expert Tip:</strong> Never introduce new ideas or arguments in the conclusion. Its sole purpose is to wrap up your essay logically and reinforce the position you've argued.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="timing">
+            <h2 class="text-3xl font-bold text-center mb-2 text-teal-700">Crucial Time Management</h2>
+            <p class="text-center text-slate-600 mb-8">How you use your 40 minutes is critical. Planning is not optional; it's the key to a coherent essay. Hover over the chart sections to see the breakdown.</p>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-16 pt-8 border-t border-slate-200">
+        <p class="text-slate-500">An interactive guide for high-scoring IELTS essays.</p>
+    </footer>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const contentData = {
+            opinion: `
+                <h5 class="font-bold mb-2">Opinion (Agree/Disagree)</h5>
+                <p><strong class="font-semibold text-slate-800">Body Paragraph 1:</strong> Present your first reason for supporting your opinion.</p>
+                <p><strong class="font-semibold text-slate-800">Body Paragraph 2:</strong> Present your second, distinct reason for supporting your opinion.</p>
+            `,
+            discussion: `
+                <h5 class="font-bold mb-2">Discussion (Discuss both views)</h5>
+                <p><strong class="font-semibold text-slate-800">Body Paragraph 1:</strong> Explore the first viewpoint presented in the question.</p>
+                <p><strong class="font-semibold text-slate-800">Body Paragraph 2:</strong> Explore the second viewpoint. If asked for your opinion, you can state it here or in the conclusion.</p>
+            `,
+            problem: `
+                <h5 class="font-bold mb-2">Problem & Solution</h5>
+                <p><strong class="font-semibold text-slate-800">Body Paragraph 1:</strong> Discuss the primary causes or effects of the problem.</p>
+                <p><strong class="font-semibold text-slate-800">Body Paragraph 2:</strong> Propose one or more viable solutions to the problems discussed.</p>
+            `
+        };
+
+        const questionTypeContent = document.getElementById('question-type-content');
+        const buttons = document.querySelectorAll('.question-type-btn');
+
+        function updateContent(type) {
+            questionTypeContent.innerHTML = contentData[type];
+            buttons.forEach(btn => {
+                btn.classList.remove('active-btn');
+                btn.classList.add('inactive-btn');
+            });
+            document.getElementById(`btn-${type}`).classList.add('active-btn');
+            document.getElementById(`btn-${type}`).classList.remove('inactive-btn');
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const type = button.id.split('-')[1];
+                updateContent(type);
+            });
+        });
+
+        updateContent('opinion');
+
+        const accordions = document.querySelectorAll('.accordion-item');
+        accordions.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = header.querySelector('span:last-child');
+
+            header.addEventListener('click', () => {
+                const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+
+                accordions.forEach(otherItem => {
+                    if(otherItem !== item) {
+                        otherItem.querySelector('.accordion-content').style.maxHeight = '0px';
+                        otherItem.querySelector('.accordion-header span:last-child').style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                if (isOpen) {
+                    content.style.maxHeight = '0px';
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(45deg)';
+                }
+            });
+        });
+
+        const blueprintCtx = document.getElementById('blueprintChart').getContext('2d');
+        new Chart(blueprintCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Introduction', 'Body Paragraph 1', 'Body Paragraph 2', 'Conclusion'],
+                datasets: [{
+                    label: 'Recommended Word Count',
+                    data: [45, 95, 95, 35],
+                    backgroundColor: ['#99f6e4', '#2dd4bf', '#14b8a6', '#0d9488'],
+                    borderColor: ['#5eead4', '#14b8a6', '#0f766e', '#047857'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ~${context.raw} words`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Word Count'
+                        }
+                    }
+                }
+            }
+        });
+
+        const timeCtx = document.getElementById('timeChart').getContext('2d');
+        new Chart(timeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Planning', 'Writing', 'Reviewing'],
+                datasets: [{
+                    label: 'Time Allocation',
+                    data: [5, 30, 5],
+                    backgroundColor: ['#f59e0b', '#0d9488', '#9ca3af'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                         callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} minutes`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
