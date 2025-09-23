@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Format vs. Plain Parquet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #fff;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #004d99;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        p {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin: 0;
+        }
+        th, td {
+            padding: 18px 25px;
+            border-bottom: 1px solid #e0e6ed;
+            vertical-align: top;
+        }
+        th {
+            background-color: #e6f2ff;
+            color: #004d99;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        tr:hover {
+            background-color: #f0f8ff;
+        }
+        td strong {
+            color: #004d99;
+        }
+        .yes {
+            color: #28a745;
+            font-weight: 700;
+        }
+        .no {
+            color: #dc3545;
+            font-weight: 700;
+        }
+        .partial {
+            color: #ffc107;
+            font-weight: 700;
+        }
+        .feature-title {
+            font-weight: 700;
+            color: #004d99;
+        }
+        .feature-desc {
+            font-style: italic;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Delta Format vs. Plain Parquet: A Detailed Comparison</h1>
+    <p>This table provides a side-by-side breakdown of the key features and differences between using plain Parquet files and the Delta Lake format for your data tables.</p>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Tables on Plain Parquet</th>
+                <th>Tables on Delta Format</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><b>Storage Structure</b> </td>
+                <td>Parquet tables are collections of <code>.parquet</code> files. Each file contains its own schema and metadata in a footer. The overall "table" is just a directory of these files. There's no central, global state to track changes or what files belong to the table.</td>
+                <td>Delta tables use the same <b>Parquet files</b>  for data storage but add a crucial <b>transaction log</b>  in a <code>_delta_log</code> directory. This log is a sequence of JSON files that acts as the "source of truth," tracking every change, including new files added, old files removed, and schema updates. This central log is the foundation for all of Delta's advanced features.</td>
+            </tr>
+            <tr>
+                <td><b>ACID Transactions</b> </td>
+                <td><span class="no">❌ Not supported.</span> Since there is no transaction log, operations like a job failure during a write can leave the table in an inconsistent state, with partially written or corrupted files. This makes concurrent writes risky and requires manual management to ensure data integrity.</td>
+                <td><span class="yes">✅ Yes.</span> The transaction log allows Delta Lake to perform all operations atomically. If a write job fails, the transaction is simply not committed to the log, leaving the table in its last valid state. This ensures data integrity and reliability, even with multiple users writing to the table simultaneously.</td>
+            </tr>
+            <tr>
+                <td><b>Updates & Deletes (DML)</b> </td>
+                <td><span class="no">❌ Difficult and inefficient.</span> <b>Parquet files are immutable.</b>  To change a single record, you must: 1) read all the data in the file that contains that record, 2) apply the change in memory, and 3) rewrite the entire file back to disk. This is a very expensive operation for large datasets.</td>
+                <td><span class="yes">✅ Easy and efficient.</span> <b>Parquet files are immutable here too.</b>  Instead of rewriting files, Delta's transaction log allows for targeted changes. When you run an <code>UPDATE</code> or <code>DELETE</code> command, Delta identifies the affected files, writes only the new or updated data to new Parquet files, and then records the old files as "deleted" in the transaction log. The old files aren't physically removed immediately, which makes <b>time travel</b> possible.</td>
+            </tr>
+            <tr>
+                <td><b>MERGE Operations</b> </td>
+                <td><span class="no">❌ Not Supported.</span> This is a major limitation. To perform a common data task like an "upsert" (update a record if it exists, otherwise insert it), you would have to write complex, multi-step code using a combination of <code>JOIN</code> and <code>UNION</code> operations. This is prone to errors and is not atomic.</td>
+                <td><span class="yes">✅ Yes.</span> <code>MERGE INTO</code> is a native, highly optimized command that simplifies complex data operations. It allows you to atomically perform a series of <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code> actions based on a condition. This is essential for modern data pipelines, especially for use cases like Change Data Capture (CDC).</td>
+            </tr>
+            <tr>
+                <td><b>Schema Enforcement</b> </td>
+                <td><span class="no">❌ No.</span> By default, a query engine like Spark will read files with different schemas within the same directory, which can lead to data quality issues, silent data loss, or runtime errors. It lacks a way to validate the structure of incoming data before writing it.</td>
+                <td><span class="yes">✅ Yes.</span> This feature is enabled by default and ensures data quality. Delta Lake will validate that the schema of the data you are writing matches the schema of the target table. If there is a mismatch (e.g., a wrong data type, or an extra column not defined in the table), the write operation will fail, preventing inconsistent data from entering your table.</td>
+            </tr>
+            <tr>
+                <td><b>Schema Evolution</b> </td>
+                <td><span class="partial">Partial.</span> Parquet as a format supports some evolution (e.g., adding a new column). However, it relies on the user's application to handle the changes. For example, if you add a column, the query engine needs to process all the existing files, which don't contain the new column, and fill in <code>NULL</code> values. It's an <b>application-side concern</b> and can be inefficient or break if not handled correctly.</td>
+                <td><span class="yes">Robust.</span> Delta Lake manages schema evolution as a <b>metadata-only change</b>  in its transaction log. When a new column is added, it updates the schema in the log. When you read the table, Delta automatically handles the old Parquet files without the new column, filling in <code>NULL</code> values seamlessly. This is a faster, more reliable <b>system-side solution</b> that requires no complex code changes.</td>
+            </tr>
+            <tr>
+                <td><b>Data Versioning & Time Travel</b> </td>
+                <td><span class="no">❌ No.</span> There is no built-in versioning. To get an old version of your data, you'd need a separate data lineage or backup system. This makes it difficult to audit changes or recover from accidental data loss.</td>
+                <td><span class="yes">✅ Yes.</span> The transaction log tracks every change as a new version. You can easily query a previous version of the table using a simple SQL command (<code>SELECT * FROM table VERSION AS OF x;</code> or <code>SELECT * FROM table TIMESTAMP AS OF '...'</code>). This is invaluable for auditing, debugging, and reproducing results.</td>
+            </tr>
+            <tr>
+                <td><b>Unified Batch & Streaming</b> </td>
+                <td><span class="no">❌ No.</span> The lack of a transaction log and the "small file problem" (creating many small files with frequent updates) makes it unsuitable for low-latency streaming workloads. The overhead of managing thousands of small files degrades performance.</td>
+                <td><span class="yes">✅ Yes.</span> The transaction log enables a unified architecture. It efficiently handles real-time data ingestion by recording new changes in the log and then using a process called <b>compaction</b> to combine those small Parquet files into larger, more efficient ones in the background.</td>
+            </tr>
+            <tr>
+                <td><b>Query Performance</b> </td>
+                <td><b>Good.</b> Parquet's columnar storage allows for fast queries by only reading the columns needed, a technique called <b>columnar pruning</b>. It can also perform <b>Data Skipping</b> by using the min/max statistics in each file's footer, but this can be inefficient for tables with many files as the query engine must read all file footers to gather the metadata. This is a great starting point for analytics.</td>
+                <td><b>Excellent.</b>  Delta retains all the benefits of Parquet's columnar storage but adds more advanced optimizations. These include <b>Data Skipping</b>  (using min/max stats in the transaction log to skip entire data files) and <b>Z-Ordering</b> (a multi-dimensional clustering technique that co-locates similar data in the same files), which can drastically speed up queries.</td>
+            </tr>
+            <tr>
+                <td><b>Data Integrity</b> </td>
+                <td><span class="no">❌ Low.</span> Without ACID transactions and schema enforcement, it's easy for your data to become inconsistent or corrupted from failed jobs, out-of-order data, or different schemas being written to the same location.</td>
+                <td><span class="yes">✅ High.</span> The transaction log ensures that data is always in a consistent, valid state. <b>Schema enforcement</b> prevents the ingestion of bad data, and features like <code>MERGE</code> and <code>UPDATE</code> are atomic, meaning they either succeed completely or fail cleanly.</td>
+            </tr>
+            <tr>
+                <td><b>Openness</b> </td>
+                <td><span class="yes">✅ Open-source.</span> A widely adopted file format that's supported by almost all big data tools and query engines. It's a fundamental standard.</td>
+                <td><span class="yes">✅ Open-source.</span> Built on top of Parquet, so it's compatible with many tools. Its open protocol allows other systems to integrate with it, making it a powerful, non-proprietary standard for building data lakes.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
