@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unity Catalog vs. AWS Glue Data Catalog Comparison</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f8ff;
+            color: #343a40;
+            margin: 0;
+            padding: 30px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            color: #20b2aa; /* Light Sea Green */
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            border-bottom: 3px solid #20b2aa;
+            padding-bottom: 10px;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 15px 20px;
+            border: 1px solid #dee2e6;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+        thead th {
+            background-color: #20b2aa;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .feature-col {
+            font-weight: 700;
+            color: #20b2aa;
+            width: 25%;
+            background-color: #e6ffff;
+        }
+        .uc-col {
+            background-color: #d8f5f5; /* Light Cyan */
+        }
+        .glue-col {
+            background-color: #f7e6e6; /* Light Salmon */
+        }
+        .uc-col strong { color: #008080; }
+        .glue-col strong { color: #8b0000; }
+        .platform-note {
+            font-size: 0.9em;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Unity Catalog vs. AWS Glue Data Catalog 🛡️</h1>
+    <p>This comparison focuses on the primary differences between Databricks' unified governance layer and AWS's centralized metadata repository.</p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Unity Catalog (UC)</th>
+            <th>AWS Glue Data Catalog (Glue)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="feature-col">Primary Role</td>
+            <td class="uc-col">A <b>Unified Governance and Data Management Layer</b> built directly into the Databricks Lakehouse Platform.</td>
+            <td class="glue-col">A <b>Centralized Metadata Repository</b> (metastore) for the AWS ecosystem. It holds table definitions and locations.</td>
+        </tr>
+        <tr>
+            <td class="feature-col">Integration & Scope</td>
+            <td class="uc-col"><b>Tightly Integrated</b> and native to Databricks. Designed to manage assets seamlessly across multiple <b>Databricks Workspaces<b>.</td>
+            <td class="glue-col"><b>Standalone AWS Service</b> integrated with many AWS tools (Athena, EMR, Redshift Spectrum, etc.) and open-source compute.</td>
+        </tr>
+        <tr>
+            <td class="feature-col">Access Control (Security)</td>
+            <td class="uc-col"><b>Fine-Grained Access Control</b> managed via <b>SQL `GRANT`/`REVOKE`<b>. Policies can be applied at the <b>table, column, or row level<b>.</td>
+            <td class="glue-col"><b>Coarse-Grained Permissions</b> managed primarily via <b>AWS IAM policies<b>. Fine-grained control (row/column) usually requires additional services like <b>AWS Lake Formation<b>.</td>
+        </tr>
+        <tr>
+            <td class="feature-col">Data Lineage</td>
+            <td class="uc-col"><b>Automated, Built-in Lineage</b> tracking. UC automatically records how data flows and transforms from source to sink across all workloads.</td>
+            <td class="glue-col"><b>No Built-in Lineage.</b> Requires manual configuration or the use of external AWS Glue ETL jobs to generate and store lineage information.</td>
+        </tr>
+        <tr>
+            <td class="feature-col">Data Discovery</td>
+            <td class="uc-col">Provides a <b>searchable catalog</b> with automatic metadata enrichment and a strong focus on data discovery.</td>
+            <td class="glue-col">Offers basic database/table indexing. Lacks advanced discovery, quality, and business glossary features without third-party tools.</td>
+        </tr>
+        <tr>
+            <td class="feature-col">Format Optimization</td>
+            <td class="uc-col"><b>Optimized for Delta Lake<b>, benefiting from Delta's ACID guarantees and features. Also supports Parquet and other open formats.</td>
+            <td class="glue-col"><b>Format Agnostic.</b> Equally manages metadata for Parquet, ORC, CSV, and other formats.</td>
+        </tr>
+        <tr>
+            <td class="feature-col">Compute Engine</td>
+            <td class="uc-col"><b>Tightly Coupled</b> with Databricks compute (clusters and SQL warehouses). It is the single metastore for all Databricks operations.</td>
+            <td class="glue-col"><b>Decoupled</b> from the compute engine. It is just the metadata provider; compute is handled separately by Athena, EMR, etc.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <p class="platform-note">
+            <strong>Key takeaway:</strong> Unity Catalog is best suited for organizations that have standardized on the <b>Databricks Lakehouse Platform</b> and need unified security and governance across workspaces. AWS Glue Data Catalog is ideal for organizations using a <b>diverse mix of AWS native and open-source tools</b> where a neutral, centralized metadata store is required.
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

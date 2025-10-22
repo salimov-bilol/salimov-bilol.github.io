@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DBFS vs HDFS vs S3 Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f4f7f9;
+        color: #343a40;
+        margin: 0;
+        padding: 30px;
+    }
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        font-family: 'Montserrat', sans-serif;
+        text-align: center;
+        color: #6f42c1; /* Purple for Cloud/Architecture */
+        margin-bottom: 30px;
+        font-size: 2.2rem;
+        border-bottom: 3px solid #6f42c1;
+        padding-bottom: 10px;
+    }
+    h2 {
+        font-family: 'Montserrat', sans-serif;
+        color: #007bff;
+        font-size: 1.5rem;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        margin-bottom: 30px;
+    }
+    th, td {
+        padding: 12px 15px;
+        border: 1px solid #dee2e6;
+        vertical-align: top;
+        line-height: 1.5;
+    }
+    thead th {
+        background-color: #6f42c1;
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+    tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    .feature-col {
+        font-weight: 700;
+        color: #343a40;
+        width: 20%;
+        background-color: #e9ecef;
+    }
+    .dbfs-col { color: #6f42c1; }
+    .hdfs-col { color: #dc3545; }
+    .s3-col { color: #28a745; }
+    .note {
+        background-color: #d1ecf1;
+        border-left: 5px solid #00a0b0;
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 4px;
+    }
+    .note strong {
+        color: #00a0b0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>DBFS vs. HDFS vs. S3: Data Storage Architectures 💾</h1>
+  <p>This comparison clarifies the distinct roles and technical specifications of Databricks File System (DBFS), Hadoop Distributed File System (HDFS), and Cloud Object Storage (S3/ADLS/GCS) within the data ecosystem.</p>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Feature</th>
+      <th>DBFS (Databricks File System)</th>
+      <th>HDFS (Hadoop Distributed File System)</th>
+      <th>S3 (Amazon Simple Storage Service)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td class="feature-col">Core Architecture</td>
+      <td class="dbfs-col"><b>Abstraction Layer / Mount Point.</b> A service that provides a single interface to a cloud data lake.</td>
+      <td class="hdfs-col"><b>Distributed File System.</b> A true file system designed to run on dedicated cluster hardware.</td>
+      <td class="s3-col"><b>Cloud Object Storage.</b> A massive, regional service based on a flat namespace (RESTful API).</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Data Location</td>
+      <td>Physically stored in the underlying <b>Cloud Object Store</b> (S3, ADLS, GCS).</td>
+      <td>Physically stored on the <b>local disks</b> of the cluster's worker nodes.</td>
+      <td>Stored on <b>Cloud Provider Infrastructure</b> (highly replicated across multiple data centers).</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Primary Purpose</td>
+      <td>To provide a <b>unified, file-system-like path</b> (e.g., <code>/dbfs/...</code>) for Databricks users to access the data lake.</td>
+      <td>Designed for <b>low-latency data locality</b> and high throughput for the older Hadoop/MapReduce ecosystem.</td>
+      <td>Designed for <b>scalable, durable, and cost-effective</b> storage; the foundation of a modern data lake.</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Data Consistency</td>
+      <td>Inherits <b>Eventual Consistency</b> from the underlying cloud store. (Delta Lake adds ACID on top).</td>
+      <td><b>Strongly Consistent<b>. Reads are guaranteed to see the most recent write immediately.</td>
+      <td><b>Eventually Consistent</b> for some operations, though most modern S3 operations are now strongly consistent.</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Latency</td>
+      <td><b>Medium<b>. Depends on network latency to the cloud object store.</td>
+      <td><b>Very Low<b>. Data is local to the compute cluster.</td>
+      <td><b>Medium<b>. Higher than HDFS, especially for frequent small file operations.</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Fault Tolerance</td>
+      <td>Inherits <b>high durability</b> (99.999999999%) from the underlying cloud store.</td>
+      <td>Achieved by <b>replicating data</b> across multiple worker nodes.</td>
+      <td>Achieved by massive <b>internal replication</b> across multiple Availability Zones.</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Cost Model</td>
+      <td>A Databricks platform feature. The actual storage is billed by the cloud provider (per GB, per API request).</td>
+      <td>Requires <b>fixed investment</b> in dedicated compute/storage hardware.</td>
+      <td><b>Pay-as-you-go</b> for storage and data transfer. Excellent cost-efficiency for archive and storage.</td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+</body>
+</html>

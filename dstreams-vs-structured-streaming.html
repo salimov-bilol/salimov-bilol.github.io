@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spark Streaming vs. Structured Streaming</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+        color: #343a40;
+        margin: 0;
+        padding: 30px;
+    }
+    .container {
+        max-width: 1400px;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        font-family: 'Montserrat', sans-serif;
+        text-align: center;
+        color: #007bff;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        border-bottom: 3px solid #007bff;
+        padding-bottom: 10px;
+    }
+    .table-container {
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+        margin: 0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 15px 20px;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: top;
+        line-height: 1.6;
+    }
+    th {
+        background-color: #e9ecef;
+        color: #495057;
+        font-weight: 700;
+        position: sticky;
+        top: 0;
+        white-space: nowrap;
+    }
+    thead th {
+        background-color: #007bff;
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+    tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    tbody tr:hover {
+        background-color: #e2f2ff;
+    }
+    .feature-col {
+        font-weight: 700;
+        color: #007bff;
+        width: 25%;
+    }
+    .old-api-col {
+        background-color: #fff3cd; /* Light warning yellow */
+    }
+    .new-api-col {
+        background-color: #d4edda; /* Light success green */
+        font-weight: 500;
+    }
+    .old-api-col strong { color: #856404; }
+    .new-api-col strong { color: #155724; }
+    .warning-text { color: #856404; font-weight: 700; }
+    .success-text { color: #155724; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Apache Spark Streaming API Comparison 🌊</h1>
+  <p>This table summarizes the core conceptual and functional differences between the legacy DStreams API and the modern, recommended Structured Streaming API.</p>
+
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Old API: Spark Streaming (DStreams)</th>
+        <th>New API: Spark Structured Streaming</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td class="feature-col">Core Abstraction (Data Model)</td>
+        <td class="old-api-col"><b>DStreams</b>  – A <b>sequence of independent RDDs</b> representing micro-batches over time.</td>
+        <td class="new-api-col"><b>Unbounded Table</b>  – A single, <b>logical table</b> that is continuously appended to with new rows.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Micro-Batch Treatment</td>
+        <td class="old-api-col">Each micro-batch is treated as a <b>new, static batch</b>. The user must <b>manually</b> manage state and continuity between them.</td>
+        <td class="new-api-col">Each micro-batch is treated as a set of <b>new rows to append</b> to the conceptual unbounded table.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Query Definition</td>
+        <td class="old-api-col">User defines a pipeline of <b>low-level RDD transformations</b>.</td>
+        <td class="new-api-col">User defines a <b>single, unified SQL/DataFrame query</b> on the unbounded table.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">The Engine's Role</td>
+        <td class="old-api-col">Spark focuses on processing the current micro-batch.</td>
+        <td class="new-api-col">Spark (<b>Catalyst Optimizer</b>) automatically determines the <b>incremental plan</b> to update the single logical table state.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Output Modes Supported</td>
+        <td class="old-api-col">Simple output using `saveAsHadoopFiles` or `foreachRDD`. No built-in concept of "complete" or "update" on the result table.</td>
+        <td class="new-api-col"><b>Three well-defined modes:</b> 1. <b>Append:</b> (Only new rows are output). 2. <b>Complete:</b> (The entire result table is written). 3. <b>Update:</b> (Only rows that were updated since the last trigger are output).</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Trigger Options</td>
+        <td class="old-api-col">Defined by a single, fixed <b>Batch Interval</b> (e.g., '2 seconds'). The job runs indefinitely at this rate.</td>
+        <td class="new-api-col"><b>Highly flexible triggers:</b> 1. <b>ProcessingTime:</b> (Fixed interval, e.g., '10 seconds'). 2. <b>Once:</b> (Process all available data and stop). 3. <b>AvailableNow:</b> (Process all available data in multiple batches, then stop). 4. <b>Continuous:</b> (Experimental, for ultra-low latency).</td>
+      </tr>
+      <tr>
+        <td class="feature-col">State Management</td>
+        <td class="old-api-col"><b>Manual and Difficult.</b> Achieved via low-level functions like updateStateByKey. State persistence and recovery are user responsibilities.</td>
+        <td class="new-api-col"><b>Automatic and Integrated.</b> Managed by the engine using Watermarking and state operators. Supports efficient incremental state.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Time Handling</td>
+        <td class="old-api-col">Primarily uses <b>Processing Time</b>. Difficult to handle late data.</td>
+        <td class="new-api-col">Uses <b>Event Time</b> and <b>Watermarking</b> to gracefully handle and aggregate late/out-of-order data.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Fault Tolerance</td>
+        <td class="old-api-col"><span class="warning-text">At-Least-Once Guarantee.</span></td>
+        <td class="new-api-col"><span class="success-text">End-to-End Exactly-Once Guarantee.</span></td>
+      </tr>
+      <tr>
+        <td class="feature-col">Optimizations</td>
+        <td class="old-api-col">Limited. Cannot utilize the full power of the Catalyst Optimizer.</td>
+        <td class="new-api-col">Full Optimization via <b>Catalyst Optimizer</b> and Spark SQL engine.</td>
+      </tr>
+      <tr>
+        <td class="feature-col">Status</td>
+        <td class="old-api-col"><span class="warning-text">Legacy / Deprecated.</span></td>
+        <td class="new-api-col"><span class="success-text">Modern / Recommended.</span></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
