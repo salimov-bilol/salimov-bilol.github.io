@@ -158,19 +158,19 @@
     <tr>
       <td class="tech-column">Z-Ordering</td>
       <td>Run the command: <br><code>OPTIMIZE table_name ZORDER BY (col1, col2);</code></td>
-      <td><b>Multi-dimensional clustering</b> that physically co-locates related data values from chosen columns.</td>
+      <td><b>Multidimensional clustering</b> that physically co-locates related data values from chosen columns.</td>
       <td>Significantly improves query performance on <b>range-based filters</b> by enabling powerful data skipping.</td>
     </tr>
     <tr>
       <td class="tech-column">Liquid Clustering</td>
       <td>Defined at table creation: <br><code>CREATE TABLE ... CLUSTERED BY (col1, col2);</code><br>Maintenance via: <br><code>OPTIMIZE table_name;</code></td>
       <td>A newer, <b>flexible clustering</b> method that automatically adapts to diverse query patterns.</td>
-      <td>Acts as a superior replacement for partitioning and Z-Ordering, optimizing a <b>wide variety of filters<b>.</td>
+      <td>Acts as a superior replacement for partitioning and Z-Ordering, optimizing a <b>wide variety of filters</b>.</td>
     </tr>
     <tr>
       <td class="tech-column">File Compaction</td>
       <td>Run the command: <br><code>OPTIMIZE table_name;</code></td>
-      <td>Consolidates many small data files into fewer, larger files (typically <b>1GB<b>) for efficient reading.</td>
+      <td>Consolidates many small data files into fewer, larger files (typically <b>1GB</b>) for efficient reading.</td>
       <td>Solves the <b>"small file problem,"</b> reducing metadata overhead and speeding up file reads.</td>
     </tr>
     <tr>

@@ -118,14 +118,14 @@
     <tr>
       <td class="feature-col">Data Consistency</td>
       <td>Inherits <b>Eventual Consistency</b> from the underlying cloud store. (Delta Lake adds ACID on top).</td>
-      <td><b>Strongly Consistent<b>. Reads are guaranteed to see the most recent write immediately.</td>
+      <td><b>Strongly Consistent</b>. Reads are guaranteed to see the most recent write immediately.</td>
       <td><b>Eventually Consistent</b> for some operations, though most modern S3 operations are now strongly consistent.</td>
     </tr>
     <tr>
       <td class="feature-col">Latency</td>
-      <td><b>Medium<b>. Depends on network latency to the cloud object store.</td>
-      <td><b>Very Low<b>. Data is local to the compute cluster.</td>
-      <td><b>Medium<b>. Higher than HDFS, especially for frequent small file operations.</td>
+      <td><b>Medium</b>. Depends on network latency to the cloud object store.</td>
+      <td><b>Very Low</b>. Data is local to the compute cluster.</td>
+      <td><b>Medium</b>. Higher than HDFS, especially for frequent small file operations.</td>
     </tr>
     <tr>
       <td class="feature-col">Fault Tolerance</td>
