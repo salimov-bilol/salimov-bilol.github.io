@@ -122,6 +122,11 @@
                 <td><span class="yes">✅ Yes.</span> <code>MERGE INTO</code> is a native, highly optimized command that simplifies complex data operations. It allows you to atomically perform a series of <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code> actions based on a condition. This is essential for modern data pipelines, especially for use cases like Change Data Capture (CDC).</td>
             </tr>
             <tr>
+                <td><b>Schema Management</b> </td>
+                <td><span class="no">❌ Decentralized.</span> The metadata is decentralized. Each file contains its own min/max statistics. The query engine must read the footer of every file to gather this information, which can become an expensive operation if you have millions of small files.</td>
+                <td><span class="yes">✅ Centralized.</span>The min/max statistics and other metadata are consolidated and stored in the centralized transaction log. This means the query engine only needs to read a few small JSON files from the log to get the full picture of the data, rather than scanning the metadata of every single Parquet file. This centralized approach makes data skipping much more efficient, especially for large tables with many files.</td>
+            </tr>
+            <tr>
                 <td><b>Schema Enforcement</b> </td>
                 <td><span class="no">❌ No.</span> By default, a query engine like Spark will read files with different schemas within the same directory, which can lead to data quality issues, silent data loss, or runtime errors. It lacks a way to validate the structure of incoming data before writing it.</td>
                 <td><span class="yes">✅ Yes.</span> This feature is enabled by default and ensures data quality. Delta Lake will validate that the schema of the data you are writing matches the schema of the target table. If there is a mismatch (e.g., a wrong data type, or an extra column not defined in the table), the write operation will fail, preventing inconsistent data from entering your table.</td>

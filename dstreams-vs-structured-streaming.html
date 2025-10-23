@@ -107,8 +107,8 @@
       <tbody>
       <tr>
         <td class="feature-col">Core Abstraction (Data Model)</td>
-        <td class="old-api-col"><b>DStreams</b>  – A <b>sequence of independent RDDs</b> representing micro-batches over time.</td>
-        <td class="new-api-col"><b>Unbounded Table</b>  – A single, <b>logical table</b> that is continuously appended to with new rows.</td>
+        <td class="old-api-col">Based on the <b>Discretized Stream (DStream)</b> model. Data is treated as a continuous sequence of <b>RDDs</b> (Resilient Distributed Datasets) that arrive in discrete time intervals (micro-batches). Each micro-batch is an RDD.</td>
+        <td class="new-api-col">Based on the DataFrame/Dataset API. Data is treated as <b>a single, unbounded, continuously appended table.</b> The query on this table is executed incrementally, as new data arrives.</td>
       </tr>
       <tr>
         <td class="feature-col">Micro-Batch Treatment</td>
@@ -117,8 +117,8 @@
       </tr>
       <tr>
         <td class="feature-col">Query Definition</td>
-        <td class="old-api-col">User defines a pipeline of <b>low-level RDD transformations</b>.</td>
-        <td class="new-api-col">User defines a <b>single, unified SQL/DataFrame query</b> on the unbounded table.</td>
+        <td class="old-api-col">You define a sequence of <b>RDD transformations</b> that are applied independently to each incoming RDD.</td>
+        <td class="new-api-col">User defines a <b>single, unified SQL/DataFrame query</b> on the conceptual unbounded table.</td>
       </tr>
       <tr>
         <td class="feature-col">The Engine's Role</td>
@@ -149,6 +149,11 @@
         <td class="feature-col">Fault Tolerance</td>
         <td class="old-api-col"><span class="warning-text">At-Least-Once Guarantee.</span></td>
         <td class="new-api-col"><span class="success-text">End-to-End Exactly-Once Guarantee.</span></td>
+      </tr>
+      <tr>
+        <td class="feature-col">Joins</td>
+        <td class="old-api-col"><span class="warning-text">Stateless.</span> Performed per micro-batch. It's essentially a join of the RDDs from those two streams that correspond to the same micro-batch time interval. <b>No State Management.</b> There's no built-in mechanism to remember past records to join them with future records.</td>
+        <td class="new-api-col"><span class="success-text">Robust.</span> You are joining two unbounded tables as if they were static tables, and Spark's query optimizer handles the incremental, stateful processing for you.</td>
       </tr>
       <tr>
         <td class="feature-col">Optimizations</td>
